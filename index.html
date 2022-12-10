@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"  type="text/css" href="css/style.css">
+    <title>Document</title>
+</head>
+<body>
+
+    <ul id="messages" type="none">
+        <li id="usercount"></li>
+    </ul>
+
+    <div class="chat-content">
+        <div class="content">
+            <div class="line">
+                <span class="chat-box">안녕?</span>
+            </div>
+            <div class="line">
+                <span class="chat-box mine">안녕!</span>
+            </div>
+        </div>
+        <form class="input-box">
+            <textarea class="input" id = "input" placeholder="Enter"></textarea>
+        </form>
+    </div>
+    
+
+    <script>
+        const webSocket = new WebSocket("ws://localhost:30001");
+        webSocket.onopen = ()=>{
+            console.log("웹소켓서버와 연결 성공");
+        };
+    
+        // 메세지 수신 이벤트 처리
+        webSocket.onmessage = function (event) {
+            var template = `<div class="line">
+                <span class="chat-box mine">${event.data}</span>
+            </div>`
+            document.querySelector('.content').insertAdjacentHTML('beforeend', template)
+        }
+    
+        // 연결 종료 이벤트 처리
+        webSocket.onclose = function(){
+            console.log("서버 웹소켓 연결 종료");
+        }
+    
+        // 에러 발생 이벤트 처리
+        webSocket.onerror = function(event){
+            console.log(event)
+        }
+    
+        //웹소켓 서버에게 메세지 보내기
+        document.querySelector('#input').addEventListener('keydown',function(event){
+            if(event.keyCode == 13){
+                var con = document.querySelector('.content')
+                if(webSocket.readyState === webSocket.OPEN){ // 연결 상태 확인
+                    webSocket.send(`${document.querySelector('#input').value}`); // 웹소켓 서버에게 메시지 전송
+                }else{
+                    alert("연결된 웹소켓 서버가 없습니다.");
+                }
+                document.querySelector("#input").value='';
+                con.scrollTop=con.scrollHeight;
+            }
+        });
+    </script>
+</body>
+</html>
