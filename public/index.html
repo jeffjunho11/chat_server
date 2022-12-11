@@ -40,6 +40,7 @@
                 <span class="chat-box mine">${event.data}</span>
             </div>`
             document.querySelector('.content').insertAdjacentHTML('beforeend', template)
+            document.querySelector('.content').scrollTop=document.querySelector('.content').scrollHeight;
         }
     
         // 연결 종료 이벤트 처리
@@ -55,14 +56,12 @@
         //웹소켓 서버에게 메세지 보내기
         document.querySelector('#input').addEventListener('keydown',function(event){
             if(event.keyCode == 13){
-                var con = document.querySelector('.content')
                 if(webSocket.readyState === webSocket.OPEN){ // 연결 상태 확인
                     webSocket.send(`${document.querySelector('#input').value}`); // 웹소켓 서버에게 메시지 전송
                 }else{
                     alert("연결된 웹소켓 서버가 없습니다.");
                 }
                 document.querySelector("#input").value='';
-                con.scrollTop=con.scrollHeight;
             }
         });
     </script>
