@@ -32,7 +32,9 @@ webSocketServer.on('connection', (ws, request)=>{
     ws.on('message', (msg)=>{
         console.log(`클라이언트[${ip}]에게 수신한 메시지 : ${msg}`);
         if(ws.readyState === ws.OPEN){ // 연결 여부 체크
-            ws.send(`${msg}`); // 데이터 전송
+            webSocketServer.clients.forEach(function(client) {
+                client.send(msg.toString());
+            }); // 데이터 전송
         }
     })
     
