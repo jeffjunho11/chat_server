@@ -1,39 +1,86 @@
 const path = require('path');
-
 const express = require('express');
+const db = require('./db.js');
+const User = require('./user.js');
 const app = express();
 
 app.use(express.static("public"));
-
 app.use("/",(req, res) =>{
     res.sendFile(path.join(__dirname, 'public/index.html'));
 })
 
-const HTTPServer = app.listen(30001, ()=>{
+const HTTPServer = app.listen(30001,'0.0.0.0' ,()=>{
     console.log("Server is open at port 30001")
 });
 
 const wsModule = require('ws');
+const user = require('./user.js');
 const webSocketServer = new wsModule.Server(
     {
         server: HTTPServer,
     }
 );
 
-webSocketServer.on('connection', (ws, request)=>{
+db();
 
+
+
+
+
+const date = new Date();
+
+const year = date.getFullYear();
+const month = ('0' + (date.getMonth() + 1)).slice(-2);
+const day = ('0' + date.getDate()).slice(-2);
+const dateStr = year + '-' + month + '-' + day;
+
+
+
+
+
+webSocketServer.on('connection', (ws, request)=>{
     //연결 클라이언트 IP 취득
     const ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
-    
     console.log(`새로운 클라이언트[${ip}] 접속`);
-    
+
+    User.find(function(error, User){
+        if(error){
+            console.log(error);
+        }else{
+            for(var i = 0; i<User.length; i++)
+            {
+                if(User[i].ip == ip)
+                {
+                    const currUser = {"ip": "True","time": `${User[i].time}`,"content": `${User[i].data}`}
+                    console.log(currUser);
+                    ws.send(JSON.stringify(currUser));
+                } else {
+                    const currUser = {"ip": "False","time": `${User[i].time}`,"content": `${User[i].data}`}
+                    console.log(currUser);
+                    ws.send(JSON.stringify(currUser));
+                }
+            }  
+        }
+    })
 
     //클라이언트로부터 메시지 수신 이벤트 처리
     ws.on('message', (msg)=>{
         console.log(`클라이언트[${ip}]에게 수신한 메시지 : ${msg}`);
         if(ws.readyState === ws.OPEN){ // 연결 여부 체크
             webSocketServer.clients.forEach(function(client) {
-                client.send(msg.toString());
+                const newUser = new User({"ip":`${ip}`, "time":`${dateStr}`, "data":`${msg}`});
+                const SendUser = {"ip": "True","time": `${dateStr}`,"content": `${msg}`}
+                client.send(JSON.stringify(SendUser));
+                
+                newUser.save(function(error, data){
+                    if(error){
+                        console.log(error);
+                    }else{
+                        console.log('Saved!')
+                    }
+                });
+                
+                
             }); // 데이터 전송
         }
     })
@@ -48,3 +95,4 @@ webSocketServer.on('connection', (ws, request)=>{
         console.log(`클라이언트[${ip}] 웹소켓 연결 종료`);
     })
 });
+

@@ -33,12 +33,21 @@
         webSocket.onopen = ()=>{
             console.log("웹소켓서버와 연결 성공");
         };
-    
+        
         // 메세지 수신 이벤트 처리
         webSocket.onmessage = function (event) {
-            var template = `<div class="line">
-                <span class="chat-box mine">${event.data}</span>
-            </div>`
+            const UserData = JSON.parse(event.data);
+            if(UserData.ip == 'True')
+            {
+                var template = `<div class="line">
+                    <span class="chat-box mine">${UserData.content}</span>
+                </div>`
+            }
+            else{
+                var template = `<div class="line">
+                    <span class="chat-box">${UserData.content}</span>
+                </div>`
+            }
             document.querySelector('.content').insertAdjacentHTML('beforeend', template)
             document.querySelector('.content').scrollTop=document.querySelector('.content').scrollHeight;
         }
