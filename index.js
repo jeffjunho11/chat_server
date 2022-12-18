@@ -39,6 +39,7 @@ const dateStr = year + '-' + month + '-' + day;
 
 
 webSocketServer.on('connection', (ws, request)=>{
+
     //연결 클라이언트 IP 취득
     const ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
     console.log(`새로운 클라이언트[${ip}] 접속`);
@@ -67,20 +68,20 @@ webSocketServer.on('connection', (ws, request)=>{
     ws.on('message', (msg)=>{
         console.log(`클라이언트[${ip}]에게 수신한 메시지 : ${msg}`);
         if(ws.readyState === ws.OPEN){ // 연결 여부 체크
+
+            const newUser = new User({"ip":`${ip}`, "time":`${dateStr}`, "data":`${msg}`});//mongoDB 저장용
+            const SendUser = {"ip": "True","time": `${dateStr}`,"content": `${msg}`}//server send용
+
+            newUser.save(function(error, data){
+                if(error){
+                    console.log(error);
+                }else{
+                    console.log('Saved!');
+                }
+            });
             webSocketServer.clients.forEach(function(client) {
-                const newUser = new User({"ip":`${ip}`, "time":`${dateStr}`, "data":`${msg}`});
-                const SendUser = {"ip": "True","time": `${dateStr}`,"content": `${msg}`}
-                client.send(JSON.stringify(SendUser));
-                
-                newUser.save(function(error, data){
-                    if(error){
-                        console.log(error);
-                    }else{
-                        console.log('Saved!')
-                    }
-                });
-                
-                
+                console.log(`${ip}`);
+                client.send(JSON.stringify(SendUser)); 
             }); // 데이터 전송
         }
     })
