@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 module.exports = () => {
   function connect() {
-    mongoose.connect('mongodb+srv://jeffjunho11:as12341234!@cluster0.icypy3l.mongodb.net/?retryWrites=true&w=majority', function(err) {
+    mongoose.connect('mongodb+srv://jeffjunho11:<password>@cluster0.icypy3l.mongodb.net/?retryWrites=true&w=majority', function(err) {
       if (err) {
         console.error('mongodb connection error', err);
       }
