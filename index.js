@@ -80,7 +80,6 @@ webSocketServer.on('connection', (ws, request)=>{
                 }
             });
             webSocketServer.clients.forEach(function(client) {
-                console.log(client);
                 if(client == ws)
                 {
                     client.send(JSON.stringify(SendUser)); 
