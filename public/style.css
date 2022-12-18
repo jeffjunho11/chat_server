@@ -57,3 +57,10 @@
     word-wrap: break-word;
     overflow-y: hidden;
 }
+
+.end{
+    text-align: center;
+    color: #FFDFDE;
+    bottom: 35px;
+    font-size: 14px;
+}
