@@ -17,14 +17,19 @@
     background: white;
     overflow-y: scroll;
     overflow-x: hidden;
-
     word-wrap: break-word;
 }
 
 .line{
     margin: 10px;
     display: flex;
+    flex-direction: column;
     background: white;
+}
+
+.chat-time{
+    background-color: white;
+    font-size: 11px;
 }
 
 .chat-box{
@@ -34,6 +39,9 @@
     max-width: 200px;
 }
 
+.person{
+    margin-right: auto;
+}
 .mine{
     margin-left: auto;
 }

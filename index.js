@@ -26,16 +26,14 @@ db();
 
 
 
-
-const date = new Date();
-
-const year = date.getFullYear();
-const month = ('0' + (date.getMonth() + 1)).slice(-2);
-const day = ('0' + date.getDate()).slice(-2);
-const dateStr = year + '-' + month + '-' + day;
-
-
-
+function get_time(){
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    const dateStr = year + '-' + month + '-' + day + ' ' + date.toLocaleTimeString('ko-kr');
+    return dateStr;
+}
 
 
 webSocketServer.on('connection', (ws, request)=>{
@@ -68,6 +66,7 @@ webSocketServer.on('connection', (ws, request)=>{
     ws.on('message', (msg)=>{
         console.log(`클라이언트[${ip}]에게 수신한 메시지 : ${msg}`);
         if(ws.readyState === ws.OPEN){ // 연결 여부 체크
+            dateStr = get_time();
             const newUser = new User({"ip":`${ip}`, "time":`${dateStr}`, "data":`${msg}`});//mongoDB 저장용
             const SendUser = {"ip": "True","time": `${dateStr}`,"content": `${msg}`}// return 용
             const SendEachUser = {"ip": "False","time": `${dateStr}`,"content": `${msg}`}// each send 용
